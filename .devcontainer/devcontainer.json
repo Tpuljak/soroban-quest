@@ -1,0 +1,41 @@
+{
+  "name": "Stellar Development Environment",
+  "dockerFile": "Dockerfile",
+  "forwardPorts": [
+    8000,
+    3000,
+    4226
+  ],
+  "portsAttributes": {
+    "8000": {
+      "label": "Testnet",
+      "onAutoForward": "ignore"
+    },
+    "3000": {
+      "label": "Albedo Signer",
+      "onAutoForward": "ignore"
+    },
+    "4226": {
+      "label": "Internal Port",
+      "onAutoForward": "ignore"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vadimcn.vscode-lldb",
+        "rust-lang.rust-analyzer"
+      ]
+    }
+  },
+  "containerEnv": {
+    "SOROBAN_RPC_URL": "https://soroban-testnet.stellar.org:443/",
+    "SOROBAN_NETWORK_PASSPHRASE": "Test SDF Network ; September 2015"
+  },
+  "onCreateCommand": "docker pull stellar/quickstart:testing",
+  "postCreateCommand": "cargo clean && cargo fetch && stellar contract build --package soroban-hello-world-contract && cargo test --package soroban-hello-world-contract",
+  "postStartCommand": {
+    "testnet": "docker run --rm -d -p 8000:8000 --name stellar stellar/quickstart:testing --testnet --enable-soroban-rpc",
+    "albedo": "cd ~/.local/_client && npm run start"
+  }
+}
